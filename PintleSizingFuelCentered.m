@@ -47,9 +47,9 @@ vapdata = table2array(vapdata);
 
 %% Engine Mission - CHECKED
 F_thrust = 2500; %N
-P_chamber = 300; %psi
-OF = 5;
-Mdot_fu = 0.200; %kg/s
+P_chamber = 600; %psi
+OF = 5.482; %optimal at 600 psi is 5.482
+Mdot_fu = 0.17028; %kg/s
 Mdot_ox = Mdot_fu * OF; %kg/s
 Mdot_total = Mdot_fu + Mdot_ox; %kg/s
 
@@ -66,21 +66,21 @@ D_cc_minimum = 3 * D_pintle; %mm
 D_cc_maximum = 5 * D_pintle; %mm
 D_cc = 5/0.0393701; %mm, 5 inches
 
-%D_pintle = 34;
-D_pintle = D_pintle / 1000; %mm
+D_pintle = 34;
+D_pintle = D_pintle / 1000; %m
 
 %% Pintle Hole Geometry - CHECKED
 
 % The ratio of the diameter of the second row of holes relative to the
 % first row of holes as well as the ratio of the third row of holes
 % relative to the first row of holes
-secondary_primary_hole_diameter_ratio = 0.5; % unitless
+secondary_primary_hole_diameter_ratio = 0.9; % unitless
 tertiary_primary_hole_diameter_ratio = 0; % unitless
 hole_diameter_ratios = [1 secondary_primary_hole_diameter_ratio tertiary_primary_hole_diameter_ratio];
 
 % Number of each size of holes
 n_holes_primary = 8; % number of holes
-n_holes_secondary = 24; % number of holes
+n_holes_secondary = 16; % number of holes
 n_holes_tertiary = 0; % number of holes
 n_holes = [n_holes_primary n_holes_secondary n_holes_tertiary];
 
@@ -90,7 +90,7 @@ Cd_fuel = 0.6; % unitless
 
 %% Pintle Annulus Geometry - CHECKED
 % length of oxidizer annulus
-l = 30/1000; % m
+l = 10/1000; % m
 
 % Initial guess of the discharge coefficient of the annulus before the
 % program generates a more accurate estimate
@@ -103,7 +103,7 @@ T_outside_k = KELVIN + T_outside; % Kelvin
 
 % Fuel Tank 
     % Fuel Tank pressure
-    P_fuel = 600; %psi
+    P_fuel = 800; %psi
     
     % Fuel Density
     Rho_fuel = 789.00; %kg/m^3
@@ -117,10 +117,10 @@ T_outside_k = KELVIN + T_outside; % Kelvin
 
 % Oxidizer Tank
     % Oxidizer Tank pressure
-    P_oxidizer = 600; %psi
+    P_oxidizer = 800; %psi
     
     % Oxidizer Vapour Pressure
-    P_oxidizer_vap = findit(T_outside + KELVIN, 1, 2, liqdata);
+    P_oxidizer_vap = findit(T_outside_k, 1, 2, liqdata);
     
     % Oxidizer Density
     Rho_oxidizer_in = findit(P_oxidizer, 2, 3, liqdata); %kg/m^3
@@ -233,7 +233,7 @@ T_outside_k = KELVIN + T_outside; % Kelvin
         m_dot_act = m_dot_act_1 + m_dot_act_2 + m_dot_act_3;
         
         if m_dot_act < Mdot_fu
-            A_fuel = 1.0001 * A_fuel;
+            A_fuel = 1.00001 * A_fuel;
         end
     end
     
@@ -252,7 +252,7 @@ TMR = (Mdot_fu * V_fuel_average)/(Mdot_ox * V_oxidizer);
 theta_cheng = acosd(1/(1+TMR));
 
 % Calculate angle of exit based on heister's gas-liquid pintle model
-theta_heister = 180/(pi*TMR^0.5);
+theta_heister = (180/pi)*TMR^0.5;
 
 % Estimate actual angle (very bad, but idk what else to do)
 theta_est = theta_cheng*(1 - X_vapour_fraction) + theta_heister * X_vapour_fraction;
